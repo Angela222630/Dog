@@ -105,6 +105,14 @@ function updateCameraSwitchButtonLabel() {
       : "切換到後置鏡頭";
 }
 
+function showCameraSwitchButton() {
+  if (!cameraSwitchButton) {
+    return;
+  }
+  cameraSwitchButton.style.display = "block";
+  cameraSwitchButton.style.visibility = "visible";
+}
+
 async function detectCameras() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
     return;
@@ -169,9 +177,7 @@ async function startCamera() {
 
     previewBox.classList.add("is-active");
     cameraToggle.textContent = "關閉鏡頭";
-    if (cameraSwitchButton) {
-      cameraSwitchButton.style.display = "block";
-    }
+    showCameraSwitchButton();
 
     if (!AIController.modelReady) {
       statusText.textContent = "模型載入中...";
