@@ -63,6 +63,8 @@ function createCameraSwitchButton() {
   cameraSwitchButton.type = "button";
   cameraSwitchButton.className = cameraToggle.className;
   cameraSwitchButton.style.display = "none";
+  cameraSwitchButton.style.marginTop = "12px";
+  cameraSwitchButton.style.display = "none";
   cameraSwitchButton.textContent = "切換鏡頭";
   cameraToggle.parentNode.insertBefore(cameraSwitchButton, cameraToggle.nextSibling);
 
@@ -102,7 +104,7 @@ async function detectCameras() {
     if (videoInputs.length > 1) {
       hasMultipleCameras = true;
       if (cameraSwitchButton) {
-        cameraSwitchButton.style.display = "inline-block";
+        cameraSwitchButton.style.display = "block";
       }
       return;
     }
@@ -118,7 +120,7 @@ async function detectCameras() {
       if (videoInputs.length > 1) {
         hasMultipleCameras = true;
         if (cameraSwitchButton) {
-          cameraSwitchButton.style.display = "inline-block";
+          cameraSwitchButton.style.display = "block";
         }
       }
     } catch (permError) {
@@ -154,7 +156,7 @@ async function startCamera() {
     previewBox.classList.add("is-active");
     cameraToggle.textContent = "關閉鏡頭";
     if (cameraSwitchButton && hasMultipleCameras) {
-      cameraSwitchButton.style.display = "inline-block";
+      cameraSwitchButton.style.display = "block";
     }
 
     if (!AIController.modelReady) {
