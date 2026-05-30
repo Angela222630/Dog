@@ -23,6 +23,7 @@ const capturedDog = document.getElementById("capturedDog");
 let currentStream = null;
 let currentFacingMode = "environment";
 let cameraSwitchButton = null;
+let hasMultipleCameras = false;
 let dogDetected = false;
 let capturedDogImage = null;
 
@@ -94,14 +95,35 @@ async function detectCameras() {
   }
 
   try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoInputs = devices.filter((d) => d.kind === "videoinput");
+    let devices = await navigator.mediaDevices.enumerateDevices();
+    let videoInputs = devices.filter((d) => d.kind === "videoinput");
 
     // 若偵測到多於一個視訊輸入裝置，顯示切換鏡頭按鈕
     if (videoInputs.length > 1) {
+      hasMultipleCameras = true;
       if (cameraSwitchButton) {
         cameraSwitchButton.style.display = "inline-block";
       }
+      return;
+    }
+
+    // 某些瀏覽器（特別是行動裝置）在未授權相機權限前無法列出所有裝置，嘗試短暫請求權限後再檢查
+    try {
+      const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      tempStream.getTracks().forEach((t) => t.stop());
+
+      devices = await navigator.mediaDevices.enumerateDevices();
+      videoInputs = devices.filter((d) => d.kind === "videoinput");
+
+      if (videoInputs.length > 1) {
+        hasMultipleCameras = true;
+        if (cameraSwitchButton) {
+          cameraSwitchButton.style.display = "inline-block";
+        }
+      }
+    } catch (permError) {
+      // 使用者可能拒絕權限或裝置不支援，靜默忽略
+      console.warn("短暫請求相機權限失敗：", permError);
     }
   } catch (error) {
     console.warn("偵測相機裝置失敗：", error);
@@ -131,7 +153,7 @@ async function startCamera() {
 
     previewBox.classList.add("is-active");
     cameraToggle.textContent = "關閉鏡頭";
-    if (cameraSwitchButton) {
+    if (cameraSwitchButton && hasMultipleCameras) {
       cameraSwitchButton.style.display = "inline-block";
     }
 
@@ -164,7 +186,8 @@ function stopCamera() {
   cameraFeed.srcObject = null;
   previewBox.classList.remove("is-active");
   cameraToggle.textContent = "開啟鏡頭";
-  if (cameraSwitchButton) {
+  // 停止相機時保留切換按鈕的可見性（若曾判定有多鏡頭）
+  if (cameraSwitchButton && !hasMultipleCameras) {
     cameraSwitchButton.style.display = "none";
   }
 
