@@ -169,7 +169,7 @@ async function startCamera() {
 
     previewBox.classList.add("is-active");
     cameraToggle.textContent = "關閉鏡頭";
-    if (cameraSwitchButton && hasMultipleCameras) {
+    if (cameraSwitchButton) {
       cameraSwitchButton.style.display = "block";
     }
 
