@@ -21,6 +21,8 @@ const dogEmoji = document.getElementById("dogEmoji");
 const capturedDog = document.getElementById("capturedDog");
 
 let currentStream = null;
+let currentFacingMode = "environment";
+let cameraSwitchButton = null;
 let dogDetected = false;
 let capturedDogImage = null;
 
@@ -41,6 +43,7 @@ GameController.init({
 });
 
 async function initPage() {
+  createCameraSwitchButton();
   statusText.textContent = "模型載入中...";
 
   const loaded = await AIController.loadModel();
@@ -52,6 +55,43 @@ async function initPage() {
   }
 }
 
+function createCameraSwitchButton() {
+  cameraSwitchButton = document.createElement("button");
+  cameraSwitchButton.type = "button";
+  cameraSwitchButton.className = cameraToggle.className;
+  cameraSwitchButton.style.display = "none";
+  cameraSwitchButton.textContent = "切換鏡頭";
+  cameraToggle.parentNode.insertBefore(cameraSwitchButton, cameraToggle.nextSibling);
+
+  cameraSwitchButton.addEventListener("click", async () => {
+    currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+    updateCameraSwitchButtonLabel();
+
+    if (currentStream) {
+      stopCamera();
+      await startCamera();
+    }
+  });
+
+  updateCameraSwitchButtonLabel();
+}
+
+function updateCameraSwitchButtonLabel() {
+  if (!cameraSwitchButton) {
+    return;
+  }
+  cameraSwitchButton.textContent =
+    currentFacingMode === "environment"
+      ? "切換到前置鏡頭"
+      : "切換到後置鏡頭";
+}
+
+function getVideoConstraints() {
+  return {
+    facingMode: { ideal: currentFacingMode },
+  };
+}
+
 async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert("此瀏覽器不支援鏡頭功能。");
@@ -59,12 +99,8 @@ async function startCamera() {
   }
 
   try {
-    const videoConstraints = {
-      facingMode: { ideal: "environment" },
-    };
-
     currentStream = await navigator.mediaDevices.getUserMedia({
-      video: videoConstraints,
+      video: getVideoConstraints(),
       audio: false,
     });
 
@@ -73,6 +109,9 @@ async function startCamera() {
 
     previewBox.classList.add("is-active");
     cameraToggle.textContent = "關閉鏡頭";
+    if (cameraSwitchButton) {
+      cameraSwitchButton.style.display = "inline-block";
+    }
 
     if (!AIController.modelReady) {
       statusText.textContent = "模型載入中...";
@@ -103,6 +142,9 @@ function stopCamera() {
   cameraFeed.srcObject = null;
   previewBox.classList.remove("is-active");
   cameraToggle.textContent = "開啟鏡頭";
+  if (cameraSwitchButton) {
+    cameraSwitchButton.style.display = "none";
+  }
 
   resetDetectionState();
 }
