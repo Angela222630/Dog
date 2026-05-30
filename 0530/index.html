@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐾 好想把狗勾帶回家！</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="page">
+    <div class="paw-row" aria-hidden="true">
+      <span>❤️</span>
+    </div>
+
+    <h1 class="title">🐾 好想把狗勾帶回家！</h1>
+
+    <p class="subtitle">
+      開啟鏡頭後，系統會使用 Teachable Machine 偵測畫面中的狗狗。偵測到狗狗後，可以點擊互動按鈕開始小遊戲。
+    </p>
+
+    <button id="cameraToggle" class="camera-button" type="button">開啟鏡頭</button>
+
+    <div class="frame-wrap">
+      <div id="previewBox" class="preview-box" aria-label="鏡頭畫面預留區">
+        <video id="cameraFeed" autoplay playsinline muted></video>
+        <div id="triggerBadge" class="trigger-badge">🐶 發現狗狗！點擊開始互動！</div>
+      </div>
+
+      <aside class="result-panel" aria-live="polite">
+        <p class="result-title">目前偵測結果</p>
+        <p id="resultLabel" class="result-label">not_dog</p>
+        <p id="resultConfidence" class="result-confidence">0%</p>
+        <p id="statusText" class="result-status">等待載入模型</p>
+      </aside>
+    </div>
+  </main>
+
+  <div id="gameOverlay" class="game-overlay" aria-hidden="true">
+    <section class="game-card" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+      <button id="gameClose" class="game-close" type="button" aria-label="關閉遊戲視窗">✕</button>
+
+      <p id="gameTitle" class="game-title">🐾 狗狗互動小遊戲</p>
+
+      <div class="captured-dog-wrap">
+        <img id="capturedDog" class="captured-dog" alt="偵測到的狗狗畫面" />
+        <div id="dogEmoji" class="dog-emoji" aria-hidden="true">🐶</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label-row">
+          <span>好感度</span>
+          <span id="affectionValue">20%</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-item">
+          <span>狗狗飽足值</span>
+          <strong id="satietyValue">50%</strong>
+        </div>
+        <div class="stat-item">
+          <span>狗狗體力值</span>
+          <strong id="energyValue">80%</strong>
+        </div>
+      </div>
+
+      <p id="gameStatus" class="game-status">狗狗正在等你陪牠玩喔！</p>
+
+      <div class="game-actions">
+        <button class="game-btn" data-action="feed" type="button">🍖 餵食</button>
+        <button class="game-btn" data-action="music" type="button">🎵 聽歌</button>
+        <button class="game-btn" data-action="pet" type="button">🤚 摸摸</button>
+        <button class="game-btn" data-action="play" type="button">🥎 玩耍</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="pianoOverlay" class="game-overlay" aria-hidden="true">
+    <section class="piano-card game-card" role="dialog" aria-modal="true" aria-labelledby="pianoTitle">
+      <button id="pianoClose" class="game-close" type="button" aria-label="關閉鋼琴模式">✕</button>
+      <p id="pianoTitle" class="game-title">🎹 鋼琴模式</p>
+      <p class="piano-instructions">彈奏琴鍵讓狗狗聽你演奏，完成後點擊離開。</p>
+      <div class="piano-keys">
+        <button class="piano-key" data-note="C" type="button">C</button>
+        <button class="piano-key" data-note="D" type="button">D</button>
+        <button class="piano-key" data-note="E" type="button">E</button>
+        <button class="piano-key" data-note="F" type="button">F</button>
+        <button class="piano-key" data-note="G" type="button">G</button>
+        <button class="piano-key" data-note="A" type="button">A</button>
+        <button class="piano-key" data-note="B" type="button">B</button>
+      </div>
+      <p id="pianoFeedback" class="piano-feedback">開始彈奏一段輕快的旋律吧！</p>
+      <button id="pianoDone" class="piano-done" type="button">離開鋼琴模式</button>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <script src="ai.js"></script>
+  <script src="game.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
