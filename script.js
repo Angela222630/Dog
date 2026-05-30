@@ -59,21 +59,35 @@ async function initPage() {
 }
 
 function createCameraSwitchButton() {
-  cameraSwitchButton = document.createElement("button");
-  cameraSwitchButton.type = "button";
-  cameraSwitchButton.className = cameraToggle.className;
-  cameraSwitchButton.style.display = "none";
-  cameraSwitchButton.style.marginTop = "12px";
-  cameraSwitchButton.style.display = "none";
-  cameraSwitchButton.textContent = "切換鏡頭";
-  cameraToggle.parentNode.insertBefore(cameraSwitchButton, cameraToggle.nextSibling);
+  // 先嘗試取得 HTML 中已存在的按鈕（依照要求需有固定的 id）
+  cameraSwitchButton = document.getElementById("switch-camera-btn");
+
+  if (!cameraSwitchButton) {
+    // 若 HTML 裡沒有，才動態建立（保留相容性）
+    cameraSwitchButton = document.createElement("button");
+    cameraSwitchButton.id = "switch-camera-btn";
+    cameraSwitchButton.type = "button";
+    cameraSwitchButton.className = cameraToggle.className;
+    cameraSwitchButton.style.display = "none";
+    cameraSwitchButton.style.marginTop = "12px";
+    cameraSwitchButton.textContent = "切換鏡頭";
+    cameraToggle.parentNode.insertBefore(cameraSwitchButton, cameraToggle.nextSibling);
+  } else {
+    // 確保樣式與 class 一致
+    cameraSwitchButton.className = cameraToggle.className;
+    cameraSwitchButton.style.marginTop = "12px";
+    // 初始隱藏，由偵測流程決定何時顯示
+    cameraSwitchButton.style.display = "none";
+  }
 
   cameraSwitchButton.addEventListener("click", async () => {
+    // 先停止現有的相機串流（如果有），再切換 facingMode 並重新啟動
     currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
     updateCameraSwitchButtonLabel();
 
     if (currentStream) {
       stopCamera();
+      // 等待停止後再重新啟動
       await startCamera();
     }
   });
