@@ -59,10 +59,12 @@ async function startCamera() {
   }
 
   try {
+    const videoConstraints = {
+      facingMode: { ideal: "environment" },
+    };
+
     currentStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "environment",
-      },
+      video: videoConstraints,
       audio: false,
     });
 
