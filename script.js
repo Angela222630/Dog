@@ -44,6 +44,8 @@ GameController.init({
 
 async function initPage() {
   createCameraSwitchButton();
+  // 檢查是否有多個視訊輸入裝置，若有則顯示切換按鈕
+  await detectCameras();
   statusText.textContent = "模型載入中...";
 
   const loaded = await AIController.loadModel();
@@ -84,6 +86,26 @@ function updateCameraSwitchButtonLabel() {
     currentFacingMode === "environment"
       ? "切換到前置鏡頭"
       : "切換到後置鏡頭";
+}
+
+async function detectCameras() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    return;
+  }
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoInputs = devices.filter((d) => d.kind === "videoinput");
+
+    // 若偵測到多於一個視訊輸入裝置，顯示切換鏡頭按鈕
+    if (videoInputs.length > 1) {
+      if (cameraSwitchButton) {
+        cameraSwitchButton.style.display = "inline-block";
+      }
+    }
+  } catch (error) {
+    console.warn("偵測相機裝置失敗：", error);
+  }
 }
 
 function getVideoConstraints() {
